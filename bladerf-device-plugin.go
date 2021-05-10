@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "fmt"
+    "github.com/fsnotify/fsnotify"
     "github.com/golang/glog"
     "golang.org/x/net/context"
     "google.golang.org/grpc"
@@ -12,6 +13,7 @@ import (
     "strings"
     "sync"
     "time"
+    "os"
     "os/exec"
 
     pluginapi "k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
@@ -176,11 +178,42 @@ func main() {
         defer wg.Done()
         endpoint := path.Join(pluginapi.DevicePluginPath, pluginEndpoint)
         glog.Info("Endpoint: ", endpoint)
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+            glog.Fatal(err)
+            return
+	}
+        defer watcher.Close()
+        go func() {
+            for {
+                select {
+                case event, ok := <-watcher.Events:
+                    if !ok {
+                        return
+                    }
+                    if event.Op&fsnotify.Remove == fsnotify.Remove {
+                        // kubelet restarted, need to re-register
+                        glog.Fatal("Can't handle kubelet restart, we'll exit")
+                        os.Exit(-1)
+                    }
+                case _, ok := <-watcher.Errors:
+                    if !ok {
+                        return
+                    }
+                }
+            }
+        }()
         lis, err := net.Listen("unix", endpoint)
         if err != nil {
             glog.Fatal(err)
             return
         }
+
+        err = watcher.Add(endpoint)
+        if err != nil {
+            glog.Error(err)
+        }
+
         grpcServer := grpc.NewServer()
         glog.Infoln("Register device plugin server")
         pluginapi.RegisterDevicePluginServer(grpcServer, srv)
