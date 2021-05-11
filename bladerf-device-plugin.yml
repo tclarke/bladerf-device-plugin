@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+    name: bladerf-device-plugin-daemonset
+    namespace: kube-system
+spec:
+    selector:
+        matchLabels:
+            name: bladerf-device-plugin-ds
+    updateStrategy:
+        type: RollingUpdate
+    template:
+        metadata:
+            annotations:
+                scheduler.alpha.kubernetes.io/critical-pod: ""
+            labels:
+                name: bladerf-device-plugin-ds
+        spec:
+            tolerations:
+                - key: CriticalAddonsOnly
+                  operator: Exists
+                - key: nuand.com/bladerf
+                  operator: Exists
+                  effect: NoSchedule
+            priorityClassName: "system-node-critical"
+            containers:
+                - image: bladerf-device-plugin:latest
+                  name: bladerf-device-plugin-ctr
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                        drop: ["ALL"]
+                volumeMounts:
+                    - mountPath: /var/run
+                      name: docker
+                    - mountPath: /proc
+                      name: proc
+                    - mountPath: "/var/lib/kubelet"
+                      name: kubelet-socket
+                    - mountPath: "/dev/bus/usb"
+                      name: usb-devs
+            volumes:
+                - name: docker
+                  hostPath:
+                    path: /var/run
+                - name: proc
+                  hostPath:
+                    path: /proc
+                - name: kubelet-socket
+                  hostPath:
+                    path: "/var/lib/kubelet"
+                - name: usb-devs
+                  hostPath:
+                    path: "/dev/bus/usb"
