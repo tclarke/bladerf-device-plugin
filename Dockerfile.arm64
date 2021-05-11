@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang
 
 ADD . /usr/src/bladerf-device-plugin
 
@@ -8,7 +8,7 @@ ENV GOPATH=/usr/src
 WORKDIR /usr/src/bladerf-device-plugin
 RUN go mod tidy && go build -o bladerf-device-plugin
 
-FROM --platform=linux/arm64/v8 alpine 
+FROM bladerf
 
 COPY --from=0 /usr/src/bladerf-device-plugin/bladerf-device-plugin ./
 
