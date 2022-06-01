@@ -5,7 +5,7 @@ FROM golang:1.18-bullseye as builder
 RUN mkdir -p /src
 WORKDIR /src
 
-RUN apt-get update -q && apt-get install -yq build-essential cmake
+RUN apt-get update -q && apt-get install -yq libusb-1.0-0-dev libusb-1.0-0 build-essential cmake libncurses5-dev libtecla1 libtecla-dev pkg-config git wget
 
 # build bladeRF tools. Install to /usr and to /bladerf-lib so we can easily access the
 # libs in the correct place and they are in a convenient place to copy to the final image
