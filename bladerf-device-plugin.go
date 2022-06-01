@@ -39,11 +39,12 @@ func (mgr *bladerfManager) discoverBladeRFs() bool {
 
     out, err := exec.Command("bladeRF-cli", "-p").Output()
 
-    if err != nil {
-        glog.Fatal(err)
+    var outs string
+    if err == nil {
+        // probe exits with non-zero status when no devices are found
+        outs := string(out)
+        glog.Info(outs)
     }
-    outs := string(out)
-    glog.Info(outs)
     id := ""
     bus := -1
     flds := strings.Fields(outs)
