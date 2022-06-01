@@ -42,9 +42,11 @@ func (mgr *bladerfManager) discoverBladeRFs() bool {
     if err != nil {
         glog.Fatal(err)
     }
+    outs := string(out)
+    glog.Info(outs)
     id := ""
     bus := -1
-    flds := strings.Fields(string(out))
+    flds := strings.Fields(outs)
 
     for idx, fld := range(flds) {
         if strings.Contains(fld, "Serial") {
@@ -53,12 +55,16 @@ func (mgr *bladerfManager) discoverBladeRFs() bool {
             bus, err = strconv.Atoi(flds[idx+1])
             if err != nil {
                 glog.Warning(err)
+            } else {
+                glog.Info(bus)
             }
         } else if strings.Contains(fld, "Address") {
             addr, err := strconv.Atoi(flds[idx+1])
             if err != nil {
                 glog.Warning(err)
                 continue
+            } else {
+                glog.Info(addr)
             }
             if len(id) > 0 && bus >= 0 {
                 pth := fmt.Sprintf("/dev/bus/usb/%03d/%03d", bus, addr)
