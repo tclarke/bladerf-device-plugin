@@ -5,6 +5,8 @@ FROM golang:1.18-bullseye as builder
 RUN mkdir -p /src
 WORKDIR /src
 
+RUN apt-get update -q && apt-get install -yq build-essential
+
 # build bladeRF tools. Install to /usr and to /bladerf-lib so we can easily access the
 # libs in the correct place and they are in a convenient place to copy to the final image
 RUN git clone https://github.com/Nuand/bladeRF.git && \
