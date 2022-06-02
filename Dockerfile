@@ -41,6 +41,7 @@ RUN go mod tidy && go build -o bladerf-device-plugin
 FROM gcr.io/distroless/static-debian11:latest
 #FROM alpine:latest
 
-COPY --from=builder /bladerf-lib/* /usr/
+COPY --from=builder /bladerf-lib/*.so* /usr/lib/
+COPY --from=builder /bladerf-lib/bladeRF-cli /usr/bin/
 COPY --from=builder /usr/src/bladerf-device-plugin/bladerf-device-plugin ./
 ENTRYPOINT ["./bladerf-device-plugin"]
