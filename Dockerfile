@@ -19,12 +19,12 @@ RUN git clone https://github.com/Nuand/bladeRF.git && \
     make -j3 install
 
 # Grab all the FPGA images
-RUN mkdir /bladeRF-images && cd /bladeRF-images && \
-    wget https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
-    wget https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
-    wget https://www.nuand.com/fpga/hostedx40-latest.rbf && \
-    wget https://www.nuand.com/fpga/hostedx115-latest.rbf
-
+#RUN mkdir /bladeRF-images && cd /bladeRF-images && \
+#    wget https://www.nuand.com/fpga/hostedxA4-latest.rbf && \
+#    wget https://www.nuand.com/fpga/hostedxA9-latest.rbf && \
+#    wget https://www.nuand.com/fpga/hostedx40-latest.rbf && \
+#    wget https://www.nuand.com/fpga/hostedx115-latest.rbf
+#
 # build device plugin
 ENV GOOS=linux
 ENV GOARCH=arm
@@ -35,8 +35,12 @@ WORKDIR /usr/src/bladerf-device-plugin
 RUN go mod tidy && go build -o bladerf-device-plugin
 
 #####
+# gcr is a bit smaller but has no shell by default
+# both alpine and gcr should work fine if you need to switch
 #
-FROM gcr.io/distroless/base-debian11
+FROM gcr.io/distroless/static-debian11:latest
+#FROM alpine:latest
+
 COPY --from=builder /bladerf-lib/* /usr/
 COPY --from=builder /usr/src/bladerf-device-plugin/bladerf-device-plugin ./
 ENTRYPOINT ["./bladerf-device-plugin"]

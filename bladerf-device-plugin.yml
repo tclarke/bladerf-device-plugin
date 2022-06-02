@@ -11,8 +11,6 @@ spec:
         type: RollingUpdate
     template:
         metadata:
-            annotations:
-                scheduler.alpha.kubernetes.io/critical-pod: ""
             labels:
                 name: bladerf-device-plugin-ds
         spec:
@@ -24,13 +22,13 @@ spec:
                   effect: NoSchedule
             priorityClassName: "system-node-critical"
             containers:
-                - image: bladerf-device-plugin:latest
+                - image: tclarke/bladerf-device-plugin:latest
                   name: bladerf-device-plugin-ctr
                   securityContext:
                     allowPrivilegeEscalation: false
                     capabilities:
                         drop: ["ALL"]
-                volumeMounts:
+                  volumeMounts:
                     - mountPath: /var/run
                       name: docker
                     - mountPath: /proc
