@@ -41,7 +41,8 @@ RUN go mod tidy && go build -o bladerf-device-plugin
 FROM gcr.io/distroless/static-debian11:debug
 #FROM alpine:latest
 
-COPY --from=builder /bladerf-lib/ /usr/lib/
-COPY --from=builder /bladerf-lib/bladeRF-cli /usr/bin/
+COPY --from=builder /bladerf-lib/lib/* /usr/lib/
+COPY --from=builder /bladerf-lib/bin/bladeRF-cli /usr/bin/
+COPY --from=builder /etc/udev/rules.d/*nuand* /etc/udev/rules.d/
 COPY --from=builder /usr/src/bladerf-device-plugin/bladerf-device-plugin /
 CMD ["/bladerf-device-plugin", "-logtostderr", "true", "-stderrthreshold", "DEBUG"]
