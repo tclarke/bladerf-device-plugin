@@ -38,10 +38,10 @@ RUN go mod tidy && go build -o bladerf-device-plugin
 # gcr is a bit smaller but has no shell by default
 # both alpine and gcr should work fine if you need to switch
 #
-FROM gcr.io/distroless/static-debian11:latest
+FROM gcr.io/distroless/static-debian11:debug
 #FROM alpine:latest
 
-COPY --from=builder /bladerf-lib/*.so* /usr/lib/
+COPY --from=builder /bladerf-lib/ /usr/lib/
 COPY --from=builder /bladerf-lib/bladeRF-cli /usr/bin/
-COPY --from=builder /usr/src/bladerf-device-plugin/bladerf-device-plugin ./
-ENTRYPOINT ["./bladerf-device-plugin"]
+COPY --from=builder /usr/src/bladerf-device-plugin/bladerf-device-plugin /
+CMD ["/bladerf-device-plugin", "-logtostderr", "true", "-stderrthreshold", "DEBUG"]
