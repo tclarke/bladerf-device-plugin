@@ -34,7 +34,9 @@ ADD . /usr/src/bladerf-device-plugin
 WORKDIR /usr/src/bladerf-device-plugin
 RUN go mod tidy && go build -o bladerf-device-plugin
 
-FROM alpine:latest
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get install -y libusb-1.0-0 libtecla1 && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /bladerf-lib/lib/* /usr/lib/
 COPY --from=builder /bladerf-lib/bin/bladeRF-cli /usr/bin/
