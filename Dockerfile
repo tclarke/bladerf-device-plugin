@@ -36,7 +36,7 @@ RUN go mod tidy && go build -o bladerf-device-plugin
 
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y libusb-1.0-0 libtecla1 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y usbutils libusb-1.0-0 libtecla1 && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /bladerf-lib/lib/* /usr/lib/
 COPY --from=builder /bladerf-lib/bin/bladeRF-cli /usr/bin/
