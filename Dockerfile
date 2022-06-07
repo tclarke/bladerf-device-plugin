@@ -32,7 +32,7 @@ ENV GOPATH=/usr/src
 
 ADD . /usr/src/bladerf-device-plugin
 WORKDIR /usr/src/bladerf-device-plugin
-RUN go mod tidy && go build -o bladerf-device-plugin
+RUN go mod download && go build -o bladerf-device-plugin
 
 FROM debian:bullseye-slim
 
